@@ -17,9 +17,9 @@ The PoC includes the deployment and configuration of the following components:
 ### Platform Services
 
 * Azure Kubernetes Service (AKS)
-* Harbor Container Registry  (🚧 @Christian - PaaS vs. Self-Deployed, was ist sinnvoller?)
-* ArgoCD (🚧 @Christian - PaaS vs. Self-Deployed, was ist sinnvoller?)
-* Forgejo (🚧 @Christian - Wäre Azure DevOps die einzige PaaS Alternative auf Azure?)
+* Harbor Container Registry  (PaaS)
+* ArgoCD (vermutlich PaaS)
+* Git Hub Enterprise (zu klären mit RITS IT)
 * Azure Key Vault
 * Kubernetes ingress and networking
 * Persistent storage
@@ -33,9 +33,7 @@ The PoC includes the deployment and configuration of the following components:
 
 * Prometheus
 * Grafana
-* Loki 
-* Alloy
-(🚧 @Christian - Modifizieren wir hier etwas?)
+* Azure Log Analytics & Monitoring 
 
 ### AI Services
 
@@ -57,16 +55,16 @@ These applications and supporting services are identified as part of the existin
 
 # 3. Security, Compliance and Governance Requirements
 
-The Azure platform will be implemented according to the client's security, governance, and operational requirements.
+The Azure platform will be implemented according to the client's requirement according CIS Benchmark Level 1 und BIS recommendations.
 
 ### Security Principles
 
-* Infrastructure and platform design aligned to client policies and standards
+* Infrastructure and platform design aligned to client CIS Benchmark Level 1.
 * Client-specific RBAC and identity model
 * Secure secret management using Azure Key Vault
 * Network segmentation and access control according to client requirements
 * Infrastructure deployed exclusively through Infrastructure as Code
-* Security-by-default platform configuration
+* Security-by-policies platform configuration
 * Auditability and configuration traceability
 
 ### AKS Hardening
@@ -74,13 +72,12 @@ The Azure platform will be implemented according to the client's security, gover
 The AKS environment will be hardened according to recognized industry best practices with the objective of achieving:
 
 * CIS Kubernetes Benchmark Level 1 compliance
-* Assessment of applicable CIS Benchmark Level 2 controls (🚧 @Christian - Bitte Prüfen - bisher war immer die Rede von CIS Benchmark level 1)
 * Secure Kubernetes RBAC configuration
 * Secure workload identity implementation
 * Network policies and namespace isolation
 * Security baseline validation during testing
 
-The final implementation will be tailored to the client's security and compliance requirements while maintaining operational usability.
+The final implementation will be tailored to the client's security and compliance policies while maintaining operational usability.
 
 ***
 
@@ -100,14 +97,13 @@ The final implementation will be tailored to the client's security and complianc
 * AKS Cluster
 * Harbor Registry
 * ArgoCD
-* Forgejo
+* Github Enterprise
 
 ## Observability Layer
 
 * Prometheus
 * Grafana
-* Loki
-* Alloy
+* Azure Log Analytics & Monitoring 
 
 ## Data Layer
 
@@ -188,34 +184,7 @@ Develop reusable and repeatable Azure deployment artefacts.
 
 ***
 
-## WP3 – AKS Platform Deployment
-
-### Objectives
-
-Deploy and harden the Kubernetes platform.
-
-### Activities
-
-* AKS deployment
-* Node pool configuration
-* Storage class configuration
-* Ingress configuration
-* RBAC implementation
-* Azure Workload Identity configuration
-* Key Vault integration
-* Namespace setup
-* CIS Benchmark hardening
-* Security baseline validation
-
-### Deliverables
-
-* Operational AKS Cluster
-* Platform Hardening Report
-* Security Baseline Documentation
-
-***
-
-## WP4 – DevOps Platform Services
+## WP3 – DevOps Platform Services
 
 ### Objectives
 
@@ -227,7 +196,7 @@ Deploy supporting DevOps and GitOps services.
 * Harbor project configuration
 * ArgoCD deployment
 * GitOps repository onboarding
-* Forgejo deployment
+* Github Enterprise  provisioning
 * Image pull secret configuration
 * Namespace integration
 
@@ -238,9 +207,37 @@ Deploy supporting DevOps and GitOps services.
 * Operational Forgejo Service
 * GitOps Configuration
 
-The deployment architecture includes Harbor, ArgoCD and namespace-based application deployment. [\[Aufsetzen...erumgebung \| PDF\]](https://capgemini-my.sharepoint.com/personal/benjamin_kloepper_capgemini_com/Documents/Microsoft%20Copilot%20Chat%20Files/Aufsetzen%20einer%20Entwicklerumgebung.pdf)
 
 ***
+
+## WP4 – AKS Platform Deployment
+
+### Objectives
+
+Deploy and harden the Kubernetes platform.
+
+### Activities
+
+* AKS related IaC (Terraform or biceps):
+  * AKS deployment
+  * Node pool configuration
+  * Storage class configuration
+  * Ingress configuration
+  * RBAC implementation
+  * Azure Workload Identity configuration
+  * Key Vault integration
+  * Namespace setup
+  * CIS Benchmark hardening
+  * Security baseline validation
+
+### Deliverables
+
+* Operational AKS Cluster
+* Security Baseline Documentation
+
+***
+
+
 
 ## WP5 – Monitoring and Logging Platform
 
@@ -252,8 +249,7 @@ Establish platform observability.
 
 * Prometheus deployment
 * Grafana deployment
-* Loki deployment
-* Alloy deployment
+* Azure Log Analytics & Monitoring 
 * Metrics collection configuration
 * Log collection configuration
 * Dashboard implementation
@@ -265,7 +261,6 @@ Establish platform observability.
 * Logging Platform
 * Operational Dashboards
 
-Prometheus, Grafana, Loki and Alloy are part of the documented RhAI environment. [\[Aufsetzen...erumgebung \| PDF\]](https://capgemini-my.sharepoint.com/personal/benjamin_kloepper_capgemini_com/Documents/Microsoft%20Copilot%20Chat%20Files/Aufsetzen%20einer%20Entwicklerumgebung.pdf)
 
 ***
 
@@ -288,8 +283,6 @@ Provide application persistence services.
 * Operational PostgreSQL Services
 * Operational Redis Services
 * Storage Documentation
-
-The environment uses PostgreSQL and Redis as central platform services. [\[Aufsetzen...erumgebung \| PDF\]](https://capgemini-my.sharepoint.com/personal/benjamin_kloepper_capgemini_com/Documents/Microsoft%20Copilot%20Chat%20Files/Aufsetzen%20einer%20Entwicklerumgebung.pdf)
 
 ***
 
@@ -314,7 +307,6 @@ Establish AI model connectivity.
 * Azure AI Foundry Integration
 * AI Connectivity Documentation
 
-LiteLLM serves as the central AI access layer for multiple applications. [\[Aufsetzen...erumgebung \| PDF\]](https://capgemini-my.sharepoint.com/personal/benjamin_kloepper_capgemini_com/Documents/Microsoft%20Copilot%20Chat%20Files/Aufsetzen%20einer%20Entwicklerumgebung.pdf)
 
 ***
 
@@ -340,8 +332,6 @@ Deploy the complete RhAI application stack.
 
 * Operational RhAI Environment
 * Application Configuration Documentation
-
-The documented platform includes these application components. [\[Aufsetzen...erumgebung \| PDF\]](https://capgemini-my.sharepoint.com/personal/benjamin_kloepper_capgemini_com/Documents/Microsoft%20Copilot%20Chat%20Files/Aufsetzen%20einer%20Entwicklerumgebung.pdf)
 
 ***
 
@@ -378,17 +368,15 @@ Prepare client teams for adoption and operations.
 
 ### Activities
 
-* Administrator training
+* Administrator training (if applicable)
 * User onboarding workshops
 * Operations walkthrough
 * Architecture walkthrough
-* Runbook creation
 * Handover sessions
 
 ### Deliverables
 
 * Administrator Guide
-* Operations Runbook
 * User Onboarding Material
 * Handover Documentation
 
@@ -408,7 +396,7 @@ Core Azure infrastructure and platform services are deployed and operational.
 * Terraform/Bicep baseline completed
 * Harbor operational
 * ArgoCD operational
-* Forgejo operational
+* Github Enterprise operational
 * PostgreSQL operational
 * Redis operational
 * Monitoring stack deployed
@@ -477,8 +465,8 @@ Transition from implementation to operational adoption.
 | ----------------------------------------- | ------------- |
 | WP1 – Architecture & Planning             | Week 1        |
 | WP2 – IaC Development                     | Week 1–2      |
-| WP3 – AKS Deployment & Hardening          | Week 2        |
-| WP4 – Platform Services Deployment        | Week 2–3      |
+| WP3 – Platform Services Deployment        | Week 2–3      |
+| WP4 – AKS Deployment & Hardening          | Week 2        |
 | WP5 – Monitoring & Logging Deployment     | Week 3        |
 | WP6 – Data Platform Deployment            | Week 3        |
 | **Milestone 1 – Basic Deployment**        | End of Week 3 |
@@ -499,13 +487,13 @@ gantt
     section Work Packages
     WP1 Architecture & Planning           :wp1, 2026-09-01, 7d
     WP2 IaC Development                   :wp2, 2026-09-01, 14d
-    WP3 AKS Deployment & Hardening        :wp3, 2026-09-08, 7d
-    WP4 Platform Services Deployment      :wp4, 2026-09-08, 14d
+    WP3 Platform Services Deployment      :wp4, 2026-09-08, 14d
+    WP4 AKS Deployment & Hardening        :wp3, 2026-09-15, 7d
     WP5 Monitoring & Logging Deployment   :wp5, 2026-09-15, 7d
     WP6 Data Platform Deployment          :wp6, 2026-09-15, 7d
     WP7 AI Platform Integration           :wp7, 2026-09-22, 7d
     WP8 RhAI Application Deployment       :wp8, 2026-09-22, 14d
-    WP9 Functional Testing                :wp9, 2026-09-29, 7d
+    WP9 Functional Testing                :wp9, 2026-09-29, 14d
     WP10 User Onboarding & Handover       :wp10, 2026-10-06, 7d
 
     section Milestones
