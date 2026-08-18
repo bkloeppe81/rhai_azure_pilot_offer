@@ -51,6 +51,125 @@ The PoC includes the deployment and configuration of the following components:
 
 These applications and supporting services are identified as part of the existing RhAI environment.
 
+### Overview
+
+```mermaid
+flowchart TB
+
+    %% Users
+    User[Business Users]
+    Admin[Administrators / DevOps Team]
+
+    %% Azure Subscription
+    subgraph Azure["Azure Subscription"]
+
+        subgraph Network["Networking & Security Layer"]
+            AGW[Azure Application Gateway / WAF]
+            VNET[Virtual Network]
+            KV[Azure Key Vault]
+            MI[Azure Workload Identity]
+        end
+
+        subgraph Platform["Platform Layer"]
+
+            GIT[GitHub Enterprise]
+
+            HARBOR[Harbor Container Registry]
+
+            ARGO[ArgoCD GitOps]
+
+            subgraph AKS["Azure Kubernetes Service (AKS)"]
+
+                subgraph Apps["RhAI Applications"]
+                    HIR[RhAI-HIR]
+                    SEB[RhAI-SE Backend]
+                    SEF[RhAI-SE Frontend]
+                    SDR[Smart Document Review]
+                    OUI[OpenWebUI]
+                    DOC[Docling]
+                end
+
+                subgraph AI["AI Services"]
+                    LLM[LiteLLM Gateway]
+                end
+
+                subgraph Data["Data Services"]
+                    PG["(PostgreSQL)"]
+                    REDIS["(Redis)"]
+                    PV[Persistent Volumes]
+                end
+
+                subgraph Obs["Observability"]
+                    PROM[Prometheus]
+                    GRAF[Grafana]
+                end
+
+            end
+
+            LOG[Azure Log Analytics / Azure Monitor]
+        end
+
+        subgraph AI_Foundry["Azure AI Services"]
+            FOUNDRY["Azure AI Foundry<br/>Hosted Foundation Models"]
+        end
+
+    end
+
+    %% User Access
+    User --> AGW
+    Admin --> GIT
+
+    %% Network Flow
+    AGW --> AKS
+
+    %% GitOps Flow
+    GIT --> ARGO
+    ARGO --> AKS
+
+    %% Container Flow
+    HARBOR --> AKS
+
+    %% Secrets & Identity
+    AKS --> MI
+    MI --> KV
+
+    %% Application Relationships
+    HIR --> LLM
+    SEB --> LLM
+    SDR --> LLM
+    OUI --> LLM
+    DOC --> LLM
+
+    SEF --> SEB
+
+    %% AI Integration
+    LLM --> FOUNDRY
+
+    %% Data Dependencies
+    HIR --> PG
+    SEB --> PG
+    SDR --> PG
+
+    HIR --> REDIS
+    SEB --> REDIS
+    SDR --> REDIS
+
+    PG --> PV
+    REDIS --> PV
+
+    %% Monitoring
+    AKS --> PROM
+    PROM --> GRAF
+
+    AKS --> LOG
+    GRAF --> LOG
+
+    %% Network Containment
+    VNET --- AKS
+    VNET --- KV
+    VNET --- AGW
+```
+
 ***
 
 # 3. Security, Compliance and Governance Requirements
@@ -158,6 +277,17 @@ The final implementation will be tailored to the client's security and complianc
 * Operational Concept
 * PoC Execution Plan
 
+### Roles
+
+|Role|Days|
+|----|----|
+|PL   | 4 |
+|Architect   | 6 |
+|Cloud | 1 |
+|Security | 2 |
+
+
+
 ***
 
 ## WP2 – Infrastructure as Code Development
@@ -181,6 +311,16 @@ Develop reusable and repeatable Azure deployment artefacts.
 * Terraform or Bicep Repository
 * Deployment Pipeline Definitions
 * Infrastructure Documentation
+
+### Roles
+
+|Role|Days|
+|----|----|
+|PL   | 1 |
+|Architect   | 2 |
+|DevOps | 5 |
+|Cloud | 5 |
+
 
 ***
 
@@ -206,6 +346,15 @@ Deploy supporting DevOps and GitOps services.
 * Operational ArgoCD Platform
 * Operational Forgejo Service
 * GitOps Configuration
+
+
+### Roles
+
+|Role|Days|
+|----|----|
+|Architect   | 1 |
+|DevOps | 5 |
+|Cloud | 8 |
 
 
 ***
@@ -235,6 +384,14 @@ Deploy and harden the Kubernetes platform.
 * Operational AKS Cluster
 * Security Baseline Documentation
 
+### Roles
+
+|Role|Days|
+|----|----|
+|Architect   | 2 |
+|DevOps | 4 |
+|Cloud |6 |
+
 ***
 
 
@@ -261,6 +418,13 @@ Establish platform observability.
 * Logging Platform
 * Operational Dashboards
 
+### Roles
+
+|Role|Days|
+|----|----|
+|Architect   | 1 |
+|DevOps | 3 |
+|Cloud |3 |
 
 ***
 
@@ -283,6 +447,15 @@ Provide application persistence services.
 * Operational PostgreSQL Services
 * Operational Redis Services
 * Storage Documentation
+
+
+### Roles
+
+|Role|Days|
+|----|----|
+|Architect   | 0.5 |
+|DevOps | 2 |
+|Cloud |4 |
 
 ***
 
@@ -307,6 +480,13 @@ Establish AI model connectivity.
 * Azure AI Foundry Integration
 * AI Connectivity Documentation
 
+### Roles
+
+|Role|Days|
+|----|----|
+|Architect   | 1 |
+|DevOps | 2 |
+|Cloud |2 |
 
 ***
 
@@ -333,6 +513,15 @@ Deploy the complete RhAI application stack.
 * Operational RhAI Environment
 * Application Configuration Documentation
 
+
+### Roles
+
+|Role|Days|
+|----|----|
+|Architect   | 1 |
+|DevOps | 5 |
+|Cloud |3 |
+
 ***
 
 ## WP9 – Functional and Integration Testing
@@ -358,6 +547,16 @@ Validate end-to-end functionality.
 * Integration Test Report
 * Issue and Resolution Log
 
+### Roles
+
+|Role|Days|
+|----|----|
+|PL  | 1 |
+|Architect   | 1 |
+|DevOps | 2 |
+|Cloud |0 |
+|Security |10 |
+
 ***
 
 ## WP10 – User Onboarding and Handover
@@ -380,7 +579,66 @@ Prepare client teams for adoption and operations.
 * User Onboarding Material
 * Handover Documentation
 
+### Roles
+
+|Role|Days|
+|----|----|
+|Architect   | 1 |
+|Cloud       | 1 |
+
 ***
+
+## WP11 – IaC & CI/CD Handover and Knowledge Transfer
+
+### Objectives
+
+Transition ownership of the RhAI platform deployment framework, Infrastructure as Code assets, GitOps processes, and CI/CD pipelines to the customer team.
+
+### Activities
+
+* Infrastructure as Code repository handover
+* Terraform/Bicep deployment walkthrough
+* GitOps operating model walkthrough
+* ArgoCD operations handover
+* CI/CD pipeline review and demonstration
+* Platform provisioning demonstration
+* Platform redeployment demonstration
+* Backup and recovery procedure walkthrough
+* Operations runbook review
+* Knowledge transfer workshops
+* Hands-on enablement sessions
+* Customer acceptance review
+
+### Deliverables
+
+* Infrastructure as Code Repository
+* CI/CD Operations Guide
+* GitOps Operations Guide
+* Platform Operations Runbook
+* Deployment and Recovery Procedures
+* Knowledge Transfer Material
+* Customer Handover Package
+* Customer Sign-Off Document
+
+### Roles
+
+| Role | Days |
+|------|-----:|
+| Architect | 0.5 |
+| DevOps | 1 |
+| Cloud | 0 |
+| Security | 0 |
+
+
+
+## WP13 – Project and Stakeholder Management
+
+### Roles
+
+| Role | Days |
+|------|-----:|
+| PL | 6 |
+
 
 # 6. Milestone Plan
 
@@ -437,25 +695,35 @@ All solution components are integrated and successfully validated.
 
 ***
 
-## Milestone 3 – User Onboarding Started
+## Milestone 3 – Project Handover Completed
 
 ### Objective
 
-Transition from implementation to operational adoption.
+Transition operational ownership of the platform to the customer team and complete knowledge transfer activities.
 
 ### Acceptance Criteria
 
 * Training material available
 * Administrator onboarding completed
-* User onboarding initiated
+* User onboarding completed
 * Operational documentation available
-* Handover sessions conducted
+* Infrastructure as Code repository handed over
+* CI/CD process documented and demonstrated
+* GitOps operating model transferred
+* Platform operations runbook delivered
+* Knowledge transfer workshops completed
+* Customer sign-off received
 
 ### Deliverables
 
 * Operations Handbook
 * Training Material
+* IaC Repository
+* CI/CD Operations Guide
+* GitOps Operations Guide
+* Platform Operations Runbook
 * Handover Package
+* Customer Sign-Off Document
 
 ***
 
@@ -475,8 +743,8 @@ Transition from implementation to operational adoption.
 | WP9 – Functional Testing                  | Week 5        |
 | **Milestone 2 – Functionality Tested**    | End of Week 5 |
 | WP10 – User Onboarding & Handover         | Week 6        |
-| **Milestone 3 – User Onboarding Started** | End of Week 6 |
-
+| WP11 – IaC & CI/CD Handover               | Week 6        |
+| **Milestone 3 – Project Handover Completed** | End of Week 6 |
 
 ```mermaid
 gantt
@@ -487,23 +755,21 @@ gantt
     section Work Packages
     WP1 Architecture & Planning           :wp1, 2026-09-01, 7d
     WP2 IaC Development                   :wp2, 2026-09-01, 14d
-    WP3 Platform Services Deployment      :wp4, 2026-09-08, 14d
-    WP4 AKS Deployment & Hardening        :wp3, 2026-09-15, 7d
+    WP3 Platform Services Deployment      :wp3, 2026-09-08, 14d
+    WP4 AKS Deployment & Hardening        :wp4, 2026-09-15, 7d
     WP5 Monitoring & Logging Deployment   :wp5, 2026-09-15, 7d
     WP6 Data Platform Deployment          :wp6, 2026-09-15, 7d
     WP7 AI Platform Integration           :wp7, 2026-09-22, 7d
     WP8 RhAI Application Deployment       :wp8, 2026-09-22, 14d
-    WP9 Functional Testing                :wp9, 2026-09-29, 14d
+    WP9 Functional Testing                :wp9, 2026-09-29, 7d
     WP10 User Onboarding & Handover       :wp10, 2026-10-06, 7d
+    WP11 IaC & CI/CD Handover             :wp11, 2026-10-06, 7d
 
     section Milestones
     M1 Basic Deployment                   :milestone, m1, 2026-09-21, 0d
     M2 Functionality Tested               :milestone, m2, 2026-10-05, 0d
-    M3 User Onboarding Started            :milestone, m3, 2026-10-12, 0d
+    M3 Project Handover Completed         :milestone, m3, 2026-10-12, 0d
 ```
-
-***
-
 
 
 # Project Deliverables Summary
@@ -513,14 +779,13 @@ gantt
 3. Infrastructure as Code (Terraform or Bicep)
 4. Harbor container registry
 5. ArgoCD GitOps platform
-6. Forgejo source code platform
-7. PostgreSQL and Redis services
-8. Prometheus, Grafana, Loki and Alloy observability platform
-9. LiteLLM integration with Azure AI Foundry hosted models
-10. Security-hardened AKS platform aligned to CIS Benchmark Level 1
-11. Client-tailored security and governance implementation
-12. Functional and integration test documentation
-13. Operations and administration documentation
-14. User onboarding package
-15. Knowledge transfer and client handover
-16. Running RhAI system ready for further development and evaluation.
+6. PostgreSQL and Redis services
+7. Prometheus, Grafana, Azure Logging observability platform
+8. LiteLLM integration with Azure AI Foundry hosted models
+9.  Security-hardened AKS platform aligned to CIS Benchmark Level 1
+10. Client-tailored security and governance implementation
+11. Functional and integration test documentation
+12. Operations and administration documentation
+13. User onboarding package
+14. Knowledge transfer and client handover
+15. Running RhAI system ready for further development and evaluation.
